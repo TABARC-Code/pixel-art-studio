@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    Pixel Art Studio
+    Author: TABARC-Code
+    Plugin URI: https://github.com/TABARC-Code/
+
+    updates in my new version:
+    - Eyedropper tool (Pick)
+    - Transform tools (Flip H / Flip V)
+    - New Project modal (confirm before you nuke your work) its experoimental
+   -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Pixel Art Studio: draw, ,pixel, fill, erase, pick colour, flip canvas, undo/redo, palette, and export PNGs." />
+  <meta name="author" content="TABARC-Code" />
+  <meta name="author" content="The AcidBath & Restraint Co." />
+  <meta property="og:title" content="Pixel Art Studio | TABARC" />
+  <meta property="og:description" content="A lightweight pixel art generator with pixel-perfect PNG export and some sane tools." />
+  <meta property="og:type" content="website" />
+
+  <title>Pixel Art Studio | TABARC - The AcidBath and Restraint Company - Code</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <header class="brandbar" role="banner">
+    <div class="brandbar__inner">
+      <div class="brandmark" aria-label="TABARC brand">
+        <svg class="brandmark__icon" viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="10" y="12" width="44" height="10" rx="2"></rect>
+          <rect x="27" y="22" width="10" height="30" rx="2"></rect>
+          <rect x="20" y="42" width="24" height="10" rx="2"></rect>
+        </svg>
+        <div class="brandmark__text">
+          <div class="brandmark__name">TABARC</div>
+          <div class="brandmark__tag">Pixel Art Studio</div>
+        </div>
+      </div>
+
+      <a class="brandbar__link" href="https://github.com/TABARC-Code/" target="_blank" rel="noreferrer">
+        github.com/TABARC-Code
+      </a>
+    </div>
+  </header>
+
+  <main class="container" role="main">
+    <h1>Pixel Art Studio</h1>
+
+    <section class="statusbar" aria-label="Status">
+      <div class="statusbar__left">
+        <span class="status-pill" id="statusTool">Tool: Draw</span>
+        <span class="status-pill" id="statusBrush">Brush: 1</span>
+        <span class="status-pill" id="statusGrid">Grid: On</span>
+        <span class="status-pill" id="statusCell">Cell: –</span>
+      </div>
+      <div class="statusbar__right">
+        <span class="status-hint" id="statusHint">
+          Shortcuts: D Draw, E Erase, F Fill, I Pick, G Grid, Ctrl/Cmd+Z Undo, Ctrl/Cmd+S Export
+        </span>
+      </div>
+    </section>
+
+    <section class="control-shell" aria-label="Controls">
+      <div class="control-panel">
+        <div class="control-group" aria-label="Canvas settings">
+          <div class="control-group__title">Canvas</div>
+
+          <label class="control-label">
+            Grid size
+            <select id="gridSize" class="custom-select">
+              <option value="16">16×16</option>
+              <option value="32">32×32</option>
+              <option value="64">64×64</option>
+            </select>
+          </label>
+
+          <label class="control-label">
+            Colour
+            <input type="color" id="colorPicker" value="#000000" class="color-input" />
+          </label>
+
+          <label class="control-label">
+            Brush
+            <select id="brushSize" class="custom-select">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </label>
+
+          <div class="control-row">
+            <button id="toggleGrid" class="tool-button" type="button">Grid: On</button>
+            <label class="control-label control-label--range">
+              Grid opacity
+              <input id="gridOpacity" class="range" type="range" min="0" max="100" value="35" />
+            </label>
+          </div>
+
+          <div class="btn-row">
+            <button id="newProjectBtn" class="tool-button danger-soft" type="button" title="New project">
+              New Project
+            </button>
+          </div>
+        </div>
+
+        <div class="control-group" aria-label="Tools">
+          <div class="control-group__title">Tools</div>
+
+          <div class="btn-row">
+            <button id="drawTool" class="tool-button active" type="button" title="Shortcut: D">Draw</button>
+            <button id="fillTool" class="tool-button" type="button" title="Shortcut: F">Fill</button>
+            <button id="eraseTool" class="tool-button" type="button" title="Shortcut: E">Erase</button>
+            <button id="pickTool" class="tool-button" type="button" title="Shortcut: I">Pick</button>
+          </div>
+
+          <div class="btn-row">
+            <button id="undoBtn" class="tool-button" type="button" title="Ctrl/Cmd+Z">Undo</button>
+            <button id="redoBtn" class="tool-button" type="button" title="Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y">Redo</button>
+            <button id="clearBtn" class="tool-button danger" type="button">Clear</button>
+          </div>
+        </div>
+
+        <div class="control-group" aria-label="Transform and export">
+          <div class="control-group__title">Transform</div>
+
+          <div class="btn-row">
+            <button id="flipHBtn" class="tool-button" type="button" title="Flip horizontally">Flip H</button>
+            <button id="flipVBtn" class="tool-button" type="button" title="Flip vertically">Flip V</button>
+          </div>
+
+          <div class="control-group__title" style="margin-top: 6px;">Export</div>
+
+          <label class="control-label">
+            Scale
+            <select id="exportScale" class="custom-select">
+              <option value="1">1× (native)</option>
+              <option value="8">8×</option>
+              <option value="16">16×</option>
+              <option value="32">32×</option>
+            </select>
+          </label>
+
+          <label class="control-check">
+            <input id="exportTransparent" type="checkbox" />
+            Transparent background
+          </label>
+
+          <button id="exportPNG" class="export-button" type="button">Export PNG</button>
+        </div>
+      </div>
+
+      <div class="palette-panel" aria-label="Palette">
+        <div class="palette-head">
+          <div class="palette-title">Palette</div>
+          <div class="palette-meta">
+            Click swatch to pick. Shift+Click a saved slot to store current colour.
+          </div>
+        </div>
+
+        <div class="palette-block">
+          <div class="palette-label">Recent</div>
+          <div id="recentSwatches" class="swatch-row" aria-label="Recent colours"></div>
+        </div>
+
+        <div class="palette-block">
+          <div class="palette-label">Saved</div>
+          <div id="savedSwatches" class="swatch-row" aria-label="Saved colours"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="canvas-wrapper" aria-label="Canvas">
+      <canvas id="pixelCanvas" class="pixel-canvas" aria-label="Pixel drawing canvas"></canvas>
+    </section>
+
+    <p class="hint">
+      Draw and Erase support dragging. Fill is click-only. Pick samples a pixel’s colour.
+      Flip H/V transforms the whole canvas (undoable).
+    </p>
+
+    <footer class="footer" role="contentinfo">
+      <span>© <span id="year"></span> TABARC-Code</span>
+      <span class="footer__sep">•</span>
+      <span>Export is nearest-neighbour and grid-accurate.</span>
+    </footer>
+  </main>
+
+  <!-- New Project modal -->
+  <div id="modalOverlay" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal__head">
+        <div class="modal__title" id="modalTitle">New Project</div>
+        <button id="modalClose" class="modal__close" type="button" aria-label="Close">✕</button>
+      </div>
+
+      <div class="modal__body">
+        <p class="modal__text">
+          This clears the canvas and resets Undo/Redo. Your palette stays.
+          If you want to keep the work, export it first. Yes, that’s obvious. People still don’t do it.
+        </p>
+
+        <label class="control-check">
+          <input id="modalKeepGrid" type="checkbox" checked />
+          Keep current grid size
+        </label>
+
+        <label class="control-label" style="margin-top: 10px;">
+          Or pick a new gridd size
+          <select id="modalGridSize" class="custom-select">
+            <option value="16">16×16</option>
+            <option value="32">32×32</option>
+            <option value="64">64×64</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="modal__actions">
+        <button id="modalCancel" class="tool-button" type="button">Cancel</button>
+        <button id="modalConfirm" class="tool-button danger" type="button">Start new</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>
