@@ -1,0 +1,11 @@
+# This project has no build step.
+# Ignore only what browsers or editors accidentally create.
+
+.DS_Store
+Thumbs.db
+
+# Editor noise
+.vscode/
+.idea/
+*.swp
+*.swo
